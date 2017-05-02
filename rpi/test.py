@@ -1,14 +1,12 @@
-from firebase import firebase
+from firebase import Firebase
+from getpass import getpass
 #https://pypi.python.org/pypi/python-firebase/1.2
 
-firebase = firebase.FirebaseApplication('https://smart-fridge-76b1c.firebaseio.com', None)
-serials = firebase.get('/Serials', None)
-
-print serials
+firebase = Firebase('https://smart-fridge-76b1c.firebaseio.com/Serials')
+serials = firebase.get()
 
 while True:
-    print "Scan a serial: ",
-    scanned = raw_input().decode('utf-8')
+    scanned = getpass("").decode('utf-8')
     if scanned in serials:
         print "You scanned " + serials[scanned]
     else:
