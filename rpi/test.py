@@ -3,6 +3,7 @@ import getpass
 import sys
 import os
 import fcntl
+import datetime
 #import pyttsx
 from firebase import Firebase
 #https://pypi.python.org/pypi/python-firebase/1.2
@@ -22,7 +23,7 @@ serials = fireserial.get()
 infridge = firein.get()
 outfridge = fireout.get()
 
-
+running = True
 def get_serial():
     global serials, infridge, outfridge
     global fireserial, firein, fireout
@@ -49,7 +50,7 @@ def get_serial():
                     print "Putting it back in..."
                 elif scanned in infridge: 
                     Firebase(fire_url+'/In Fridge/'+scanned).delete()
-                    Firebase(fire_url+'/Taken Out/').patch({scanned:True})
+                    Firebase(fire_url+'/Taken Out/').patch({scanned:time.strftime("%b %d %Y %I:%M%p")})
                     outfridge[scanned] = infridge[scanned]
                     infridge.pop(scanned)
                     print "Taking it out..."
@@ -63,10 +64,20 @@ def get_serial():
             pass
         
         if a >= 50:
+            a = 0
+            #Check if the database was updated
             serials = fireserial.get()
             infridge = firein.get()
             outfridge = fireout.get()
-            a = 0
+            
+            #Check for things out too long
+            for key, val in outfridge.items():
+                if key == 'na': continue
+                outTime = datetime.datetime.strptime(val, '%b %d %Y %I:%M%p')
+                if (datetime.datetime.now() - outTime).total_seconds() > 60:
+                    print "old!"
+                    Firebase(fire_url+'/Taken Out/'+key).delete()
+                    outfridge.pop(key)
 
         a += 1
 
