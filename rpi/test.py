@@ -42,6 +42,19 @@ def put_in(scanned):
         infridge[scanned] = {}
         infridge[scanned]["num"] = 1
 
+def take_out(scanned):
+    global infridge, outfridge
+
+    if infridge[scanned]["num"] == 1:
+        Firebase(fire_url+'/In Fridge/'+scanned).delete()
+        infridge.pop(scanned)
+    else:
+        infridge[scanned]["num"] -= 1
+        Firebase(fire_url+'/In Fridge/').patch({scanned:{"num":infridge[scanned]["num"]}})
+
+    outfridge[scanned] = time.strftime("%b %d %Y %I:%M%p")
+    Firebase(fire_url+'/Taken Out/').patch({scanned:outfridge[scanned]})
+
 running = True
 def get_serial():
     global serials, infridge, outfridge
@@ -51,7 +64,20 @@ def get_serial():
     print serials
     
     last_update = datetime.datetime.now() #counter for updating
+    last_scan = datetime.datetime.min
+    last_in = datetime.datetime.min
     while running:
+        #try to get some data from the Arduino
+        bytesToRead = ser.inWaiting()
+        if(bytesToRead > 0):
+            val = ser.readline()
+            print "Got something!\t" + val,
+            last_in = datetime.datetime.now()
+            if (datetime.datetime.now() - last_scan).total_seconds <= 5:
+                print "Matched putting in"
+                last_in = last_scan = datetime.datetime.min
+            
+    
 
         #Try to read a scanned serial number
         try:
@@ -64,25 +90,21 @@ def get_serial():
                     #engine.say(str("Test test test"))
                     #engine.runAndWait()
                     
-                    if scanned in infridge: 
-                        #Firebase(fire_url+'/In Fridge/'+scanned).delete()
-                        #Firebase(fire_url+'/Taken Out/').patch({scanned:time.strftime("%b %d %Y %I:%M%p")})
-                        #outfridge[scanned] = infridge[scanned]
-                        #infridge.pop(scanned)
-                        print "Taking it out..."
-                    #else: 
-                    put_in(scanned)
+                    late_scan = datetime.datetime.now()
+                    if (datetime.datetime.now() - last_in).total_seconds() <= 5:
+                        take_out(scanned)
+                        #print last_scan.strftime("%b %d %Y %I:%M%p")
+                        #print last_in.strftime("%b %d %Y %I:%M%p")
+                        print (last_scan - last_in).total_seconds()
+                        print "Matched taking out"
+                        last_in = last_scan = datetime.datetime.min
+                    else: 
+                        put_in(scanned)
                     
                 else:
                     print "I don't recognize that product..."
         except IOError:
             pass
-
-        #try to get some data from the Arduino
-        bytesToRead = ser.inWaiting()
-        if(bytesToRead > 0):
-            val = ser.readline()
-            print "Got something!\t" + val,
         
         if (datetime.datetime.now() - last_update).total_seconds() >= 30:
             last_update = datetime.datetime.now()
