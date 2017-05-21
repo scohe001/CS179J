@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorBlack">#000000</color>
+    <color name="colorWhite">#ffffff</color>
+
+    <!--Colors chosen from here: https://coolors.co/87b38d-0f5257-0b3142-c6b9cd-d6d3f0-->
+    <color name="colorPrimary">#87B38D</color>
+    <color name="colorPrimaryDark">#0F5257</color>
+    <color name="colorAccent">#C6B9CD</color>
+    <color name ="colorDarker">#0B3142</color>
+    <color name ="colorLight">#D6D3F0</color>
+</resources>
