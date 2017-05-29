@@ -2,8 +2,10 @@ package com.example.aricohen.fridge;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -37,15 +39,17 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout mainframe;
     private ImageButton addButt;
     private ListView inFridgeList;
-    private Activity me;
     private FoodListAdapter inFridgeAdapter;
+    private ListView historyList;
+    private FoodListAdapter historyAdapter;
+    private Activity me;
 
     //Called when add button is clicked
     private ImageButton.OnClickListener addClickListener
             = new ImageButton.OnClickListener() {
 
         public void onClick(View v) {
-            inFridgeAdapter.add(new Food("Added!", "a", "a"));
+            inFridgeAdapter.add(new Food("Added!", "a", "2017-05-23T22:20:21.962Z"));
         }
     };
 
@@ -64,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
                     addButt.setVisibility(View.INVISIBLE);
                     LayoutInflater.from(appContext).inflate(R.layout.history, mainframe, true);
                     myRef.setValue("History");
+
+                    historyList = (ListView) findViewById(R.id.history_list);
+                    historyAdapter.setParent(historyList);
+                    historyList.setAdapter(historyAdapter);
+
                     return true;
                 case R.id.navigation_dashboard:
                     addButt.setVisibility(View.INVISIBLE);
@@ -93,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,19 +116,56 @@ public class MainActivity extends AppCompatActivity {
         me = this;
 
         // Read from the database
-        database.getReference("message").addValueEventListener(new ValueEventListener() {
+        database.getReference("In Fridge").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("DB", "Value is: " + value);
+                //String value = dataSnapshot.getValue(String.class);
+                inFridgeAdapter.clear();
+
+                for(DataSnapshot foodSnapshot : dataSnapshot.getChildren()) {
+                    if(foodSnapshot.getKey().equals("na")) continue;
+                    String fSerial = foodSnapshot.child("Serial").getValue().toString();
+                    inFridgeAdapter.add(new Food(fSerial, "name", foodSnapshot.child("inDate").getValue().toString()));
+
+                    Log.d("DB", "Updating things...");
+//                    if(!inFridgeSet.containsKey(fSerial)) {
+//                        inFridgeSet.put(fSerial, new ArrayList<Food>());
+//                    }
+//                    inFridgeSet.get(fSerial).add(new Food(fSerial, "name", foodSnapshot.child("inDate").toString()));
+//
+//                    Log.d("DB", "Value is: " + foodSnapshot.child("Serial").toString());
+                    //Log.d("DB", "Value is: " + foodSnapshot.toString());
+                }
+
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
                 Log.w("DB", "Failed to read value.", error.toException());
+            }
+        });
+
+        database.getReference("History").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                historyAdapter.clear();
+
+                for(DataSnapshot foodSnapshot : dataSnapshot.getChildren()) {
+                    if(foodSnapshot.getKey().equals("na")) continue;
+                    String fSerial = foodSnapshot.child("Serial").getValue().toString();
+                    historyAdapter.add(new Food(fSerial, "name", foodSnapshot.child("inDate").getValue().toString()));
+
+                    Log.d("DB", "Updating history...");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Failed to read value
+                Log.w("DB", "Failed to read value.", databaseError.toException());
             }
         });
 
@@ -145,19 +192,10 @@ public class MainActivity extends AppCompatActivity {
         addButt.setVisibility(View.INVISIBLE);
 
         inFridgeList = (ListView) findViewById(R.id.in_fridge_list);
+        inFridgeAdapter = new FoodListAdapter(me, new ArrayList<ArrayList<Food>>(), inFridgeList);
 
-        ArrayList<Food> foodList = new ArrayList<Food>();
-        foodList.add(new Food("test", "a", "a"));
-        foodList.add(new Food("asdf", "a", "a"));
-        foodList.add(new Food("fdsa", "a", "a"));
-        foodList.add(new Food("okay", "a", "a"));
-        foodList.add(new Food("So....", "a", "a"));
-        foodList.add(new Food("This works?", "a", "a"));
-        foodList.add(new Food("Maybe?", "a", "a"));
-        foodList.add(new Food("Please???", "a", "a"));
-        foodList.add(new Food("K.", "a", "a"));
-
-        inFridgeAdapter = new FoodListAdapter(me, foodList, inFridgeList);
+        historyList = (ListView) findViewById(R.id.history_list);
+        historyAdapter = new FoodListAdapter(me, new ArrayList<ArrayList<Food>>(), historyList);
 
     }
 

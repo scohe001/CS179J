@@ -6,58 +6,41 @@
     android:orientation="horizontal"
     android:padding="5dip" >
 
-    <!--  ListRow Left sied Thumbnail image -->
-    <LinearLayout android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="3dip"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="5dip">
-        <!--android:background="@drawable/image_bg"-->
 
-        <ImageView
-            android:id="@+id/list_image"
-            android:layout_width="50dip"
-            android:layout_height="50dip"
-            android:src="@drawable/ic_home_black_24dp"/>
-
-    </LinearLayout>
-
-    <!-- Title Of Song-->
+    <!-- Title Of Food-->
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/list_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Rihanna Love the way lie"
+        android:text="Beans"
         android:textColor="@color/colorDarker"
         android:typeface="sans"
         android:textSize="15dip"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_marginLeft="5dp"/>
 
-    <!-- Artist Name -->
+    <!-- Serial -->
     <TextView
-        android:id="@+id/artist"
+        android:id="@+id/list_serial"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title"
+        android:layout_below="@id/list_title"
         android:textColor="@color/colorDarker"
         android:textSize="10dip"
         android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Just gona stand there and ..." />
+        android:text="848719056563"
+        android:layout_marginLeft="5dp" />
 
-    <!-- Rightend Duration -->
+    <!-- Date Added -->
     <TextView
-        android:id="@+id/duration"
+        android:id="@+id/list_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/title"
+        android:layout_alignTop="@id/list_title"
         android:gravity="right"
         android:text="5:45"
-        android:layout_marginRight="5dip"
+        android:layout_marginRight="30dip"
         android:textSize="10dip"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"/>
