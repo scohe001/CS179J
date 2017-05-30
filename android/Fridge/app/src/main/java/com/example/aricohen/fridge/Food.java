@@ -25,13 +25,16 @@ public class Food {
         title = tit;
         serial = ser;
 
-        Log.d("DATE", "Parsing date "+inF.substring(0, inF.length()-2));
-        //TODO Fix this format to match Firebase
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
+        Log.d("DATE", "Parsing date "+inF);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
         try {
-            inFridge = dateFormat.parse(inF.substring(0, inF.length()-2));
-            if(!outF.equals("nope")) outFridge = dateFormat.parse(outF);
-            else outFridge = null;
+            inFridge = dateFormat.parse(inF);
+            //Convert Universal to PDT
+            inFridge = new Date(inFridge.getTime() - 7 * 3600 * 1000);
+            if(!outF.equals("nope")) {
+                outFridge = dateFormat.parse(outF);
+                outFridge = new Date(outFridge.getTime() - 7 * 3600 * 1000);
+            } else outFridge = null;
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp" android:layout_height="wrap_content">
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioGroup
+            android:id="@+id/left_radio_group"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/banana_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Banana"
+                android:onClick="onLeftRadioButtonClicked"/>
+
+            <RadioButton
+                android:id="@+id/watermelon_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Watermelon"
+                android:onClick="onLeftRadioButtonClicked"/>
+
+            <RadioButton
+                android:id="@+id/watermelon_radio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Onion"
+                android:onClick="onLeftRadioButtonClicked"/>
+
+            <RadioButton
+                android:id="@+id/watermelon_radio2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Squash"
+                android:onClick="onLeftRadioButtonClicked"/>
+
+
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/right_radio_group"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apple"
+                android:onClick="onRightRadioButtonClicked"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eggplant"
+                android:onClick="onRightRadioButtonClicked"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bell Pepper"
+                android:onClick="onRightRadioButtonClicked"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Corn"
+                android:onClick="onRightRadioButtonClicked"/>
+
+        </RadioGroup>
+
+    </TableRow>
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp">
+
+        <Button
+            android:id="@+id/add_perishable_cancel"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:background="@drawable/food_button"
+            android:layout_marginRight="1dp"
+            android:text="Cancel"/>
+
+        <Button
+            android:id="@+id/add_perishable_add"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:background="@drawable/food_button"
+            android:layout_marginLeft="1dp"
+            android:text="Add!"/>
+
+
+    </TableRow>
+
+</TableLayout>

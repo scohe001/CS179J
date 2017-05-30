@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp">
+
+
+        <TextView android:id="@+id/food_info_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:text="Apple"
+            android:gravity="top"
+            android:textStyle="normal|bold"
+            android:textColor="@color/colorDarker"
+            android:textSize="30dp"/>
+
+        <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/food_info_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp">
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </TableLayout>
+
+        <Button
+            android:id="@+id/food_info_back"
+            android:text="Back"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

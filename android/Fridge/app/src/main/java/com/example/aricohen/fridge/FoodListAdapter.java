@@ -1,11 +1,13 @@
 package com.example.aricohen.fridge;
 
+import android.util.Log;
 import android.widget.BaseAdapter;
 
 /**
  * Created by aricohen on 5/21/17.
  */
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +27,12 @@ import android.widget.TextView;
 
 public class FoodListAdapter extends BaseAdapter {
 
-    private Activity activity;
+    private MainActivity activity;
     private ArrayList<ArrayList<Food>> mDataSource;
     private static LayoutInflater inflater=null;
     private ListView parentView;
 
-    public FoodListAdapter(Activity a, ArrayList<ArrayList<Food>> d, ListView lv) {
+    public FoodListAdapter(MainActivity a, ArrayList<ArrayList<Food>> d, ListView lv) {
         activity = a;
         mDataSource=d;
         parentView = lv;
@@ -42,7 +44,7 @@ public class FoodListAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return position;
+        return mDataSource.get(position);
     }
 
     public long getItemId(int position) {
@@ -59,9 +61,25 @@ public class FoodListAdapter extends BaseAdapter {
         TextView inDate = (TextView)vi.findViewById(R.id.list_date); // duration
 
         ArrayList<Food> f = mDataSource.get(position);
-        title.setText(f.get(0).title);
+
+        String titleVal;
+        if(f.get(0).serial.startsWith("(")) {
+            titleVal = f.get(0).title;
+        } else {
+            titleVal = activity.serials.get(f.get(0).serial);
+        }
+
+
+        if(f.size() > 1) {
+            title.setText(titleVal + " (" + String.valueOf(f.size()) + ")");
+            //inDate.setText("Multiple");
+        } else {
+            title.setText(titleVal);
+        }
         serial.setText(f.get(0).serial);
-        inDate.setText(f.get(0).inFridge.toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MM/dd/yy hh:mm a");
+        inDate.setText(sdf.format(f.get(0).inFridge));
+
 
         return vi;
     }

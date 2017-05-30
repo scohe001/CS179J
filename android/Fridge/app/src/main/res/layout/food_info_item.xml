@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="10dp">
+
+    <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="Purchased"
+                android:gravity="top"
+                android:textStyle="normal|bold"
+                android:textColor="@color/colorDarker"
+                android:textSize="18dp"/>
+
+            <TextView
+                android:id="@+id/food_info_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="06/06/6666"
+                android:gravity="top"
+                android:textColor="@color/colorDarker"
+                android:textSize="18dp"
+                android:layout_weight="1"
+                android:ellipsize="none"
+                android:maxLines="100"
+                android:scrollHorizontally="false"/>
+
+    </TableRow>
+
+
+</TableLayout>
