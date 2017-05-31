@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private String food_to_add;
 
 
-    private AdapterView.OnItemClickListener onFoodClick
+    private AdapterView.OnItemClickListener onFridgeFoodClick
             = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -94,6 +94,45 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     setupFridge();
+                }
+            });
+        }
+    };
+
+    private AdapterView.OnItemClickListener onHistoryFoodClick
+            = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            //System.out.println("Tapped "+ inFridgeAdapter.getItem(i).toString());
+            mainframe.removeAllViews();
+            addButt.setVisibility(View.INVISIBLE);
+
+            LayoutInflater.from(appContext).inflate(R.layout.food_info, mainframe, true);
+            LinearLayout foodLayout = (LinearLayout) findViewById(R.id.food_info_layout);
+
+            TextView foodTitle = (TextView) findViewById(R.id.food_info_title);
+
+            if(((ArrayList<Food>)historyAdapter.getItem(i)).get(0).serial.startsWith("(")) {
+                foodTitle.setText(((ArrayList<Food>) historyAdapter.getItem(i)).get(0).title);
+            } else {
+                foodTitle.setText(serials.get(((ArrayList<Food>) historyAdapter.getItem(i)).get(0).serial));
+            }
+
+            for(Food f : (ArrayList<Food>)historyAdapter.getItem(i)) {
+                View v = LayoutInflater.from(appContext).inflate(R.layout.food_info_item, foodLayout, false);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                TextView tv = (TextView) v.findViewById(R.id.food_info_date);
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MM/dd/yy hh:mm a");
+                tv.setText(sdf.format(f.inFridge));
+                foodLayout.addView(v, params);
+            }
+
+            Button backButt = (Button) findViewById(R.id.food_info_back);
+            backButt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setupHistory();
                 }
             });
         }
@@ -194,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         historyAdapter.setParent(historyList);
         historyList.setAdapter(historyAdapter);
 
-        historyList.setOnItemClickListener(onFoodClick);
+        historyList.setOnItemClickListener(onHistoryFoodClick);
     }
 
     //Called when fridge tab is selected
@@ -209,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         inFridgeAdapter.setParent(inFridgeList);
         inFridgeList.setAdapter(inFridgeAdapter);
 
-        inFridgeList.setOnItemClickListener(onFoodClick);
+        inFridgeList.setOnItemClickListener(onFridgeFoodClick);
     }
 
     //Called when new navigation option selected
