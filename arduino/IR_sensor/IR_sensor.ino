@@ -10,7 +10,7 @@ void setup() {
 bool pressed = false;
 
 void loop() {
-  
+  Serial.println(digitalRead(BUTTON));
   if(digitalRead(BUTTON) == LOW) { //Low is pressed for buttons
     if(!pressed) {
       pressed = true;

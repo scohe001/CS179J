@@ -3,7 +3,6 @@ import getpass
 import sys
 import os
 import fcntl
-import datetime
 import serial
 #import pyttsx
 from firebase import Firebase
@@ -21,63 +20,52 @@ fire_url = 'https://smart-fridge-76b1c.firebaseio.com'
 
 fireserial = Firebase(fire_url+'/Serials')
 firein = Firebase(fire_url+'/In Fridge')
-fireout = Firebase(fire_url+'/Taken Out')
+#fireout = Firebase(fire_url+'/Taken Out')
+fireputin = Firebase(fire_url+'/Functions/PutIn')
+firetakeout = Firebase(fire_url+'/Functions/TakeOut')
 
 serials = fireserial.get()
-infridge = firein.get()
-outfridge = fireout.get()
+num_in = len(firein.get())
 
 def put_in(scanned):
-    global infridge, outfridge
+    global num_in
 
-    if scanned in outfridge:    
-        Firebase(fire_url+'/Taken Out/'+scanned).delete()
-        outfridge.pop(scanned)
-        print "Puttin it back in..."
-    if scanned in infridge:
-        infridge[scanned]["num"] += 1
-        Firebase(fire_url+'/In Fridge/').patch({scanned:{"num":infridge[scanned]["num"]}})
-    else:        
-        Firebase(fire_url+'/In Fridge/').patch({scanned:{"num":1}})
-        infridge[scanned] = {}
-        infridge[scanned]["num"] = 1
-
+    num_in += 1
+    #fireputin.patch({scanned:True})
+    print "Puttin in " + serials[scanned]
+    
 def take_out(scanned):
-    global infridge, outfridge
+    global num_in
 
-    if infridge[scanned]["num"] == 1:
-        Firebase(fire_url+'/In Fridge/'+scanned).delete()
-        infridge.pop(scanned)
-    else:
-        infridge[scanned]["num"] -= 1
-        Firebase(fire_url+'/In Fridge/').patch({scanned:{"num":infridge[scanned]["num"]}})
+    num_in -= 1
 
-    outfridge[scanned] = time.strftime("%b %d %Y %I:%M%p")
-    Firebase(fire_url+'/Taken Out/').patch({scanned:outfridge[scanned]})
-
+    #firetakeout.patch({scanned:True})
+    print "Taking out " + serials[scanned] 
+    
 running = True
 def get_serial():
-    global serials, infridge, outfridge
-    global fireserial, firein, fireout
+    global serials, num_in
     global running
     
-    print serials
+    #print serials
     
-    last_update = datetime.datetime.now() #counter for updating
-    last_scan = datetime.datetime.min
-    last_in = datetime.datetime.min
+    last_scan = -1
+    last_in = -1
     while running:
         #try to get some data from the Arduino
         bytesToRead = ser.inWaiting()
         if(bytesToRead > 0):
             val = ser.readline()
             print "Got something!\t" + val,
-            last_in = datetime.datetime.now()
-            if (datetime.datetime.now() - last_scan).total_seconds <= 5:
-                print "Matched putting in"
-                last_in = last_scan = datetime.datetime.min
+
+            if(val[0] == "1"):
+                last_in = 0
+                if last_scan >= 0:
+                    print "Matched putting in"
+                    (last_in, last_scan) = (-1, -1)
+            elif(val[0] == "2"):
+                ser.write(str(num_in))
             
-    
 
         #Try to read a scanned serial number
         try:
@@ -87,44 +75,30 @@ def get_serial():
                 if scanned == 'stop'.decode('utf-8'): running = False
                 elif scanned in serials:
                     print "Scanned " + serials[scanned]
-                    #engine.say(str("Test test test"))
-                    #engine.runAndWait()
                     
-                    late_scan = datetime.datetime.now()
-                    if (datetime.datetime.now() - last_in).total_seconds() <= 5:
+                    if last_in >= 0:
                         take_out(scanned)
-                        #print last_scan.strftime("%b %d %Y %I:%M%p")
-                        #print last_in.strftime("%b %d %Y %I:%M%p")
-                        print (last_scan - last_in).total_seconds()
                         print "Matched taking out"
-                        last_in = last_scan = datetime.datetime.min
+                        (last_in, last_scan) = (-1, -1) 
                     else: 
                         put_in(scanned)
+                        last_scan = 0
                     
                 else:
                     print "I don't recognize that product..."
         except IOError:
             pass
-        
-        if (datetime.datetime.now() - last_update).total_seconds() >= 30:
-            last_update = datetime.datetime.now()
-            #Check if the database was updated
-            serials = fireserial.get()
-            infridge = firein.get()
-            outfridge = fireout.get()
-            
-            #Check for things out too long
-            for key, val in outfridge.items():
-                if key == 'na': continue
-                outTime = datetime.datetime.strptime(val, '%b %d %Y %I:%M%p')
-                #Made this 60 seconds for testing, should be 3600 in production
-                if (datetime.datetime.now() - outTime).total_seconds() > 60:
-                    print "old!"
-                    Firebase(fire_url+'/Taken Out/'+key).delete()
-                    outfridge.pop(key)
 
+        if(last_scan >= 0):
+            last_scan += 1
+            if(last_scan > 500): last_scan = -1
+        if(last_in >= 0):
+            last_in += 1
+            if(last_in > 500): last_in = -1
+            
         time.sleep(.01)
 
             
 
+print "Ready!"
 get_serial()
