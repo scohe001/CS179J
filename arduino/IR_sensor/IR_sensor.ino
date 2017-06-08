@@ -8,13 +8,14 @@ void setup() {
 }
 
 bool pressed = false;
+int thing = 0;
 
 void loop() {
-  Serial.println(digitalRead(BUTTON));
+  //Serial.println(digitalRead(BUTTON));
   if(digitalRead(BUTTON) == LOW) { //Low is pressed for buttons
     if(!pressed) {
       pressed = true;
-      Serial.println(1);
+      Serial.println(thing++);
     }
   } else {
     pressed = false;

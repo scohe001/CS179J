@@ -4,7 +4,6 @@ import sys
 import os
 import fcntl
 import serial
-#import pyttsx
 from firebase import Firebase
 #https://pypi.python.org/pypi/python-firebase/1.2
 
@@ -15,7 +14,6 @@ fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, fl | os.O_NONBLOCK)
 #setup serial for communicating with the Arduino
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
-#engine = pyttsx.init()
 fire_url = 'https://smart-fridge-76b1c.firebaseio.com'
 
 fireserial = Firebase(fire_url+'/Serials')
@@ -24,6 +22,7 @@ firein = Firebase(fire_url+'/In Fridge')
 fireputin = Firebase(fire_url+'/Functions/PutIn')
 firetakeout = Firebase(fire_url+'/Functions/TakeOut')
 
+#Grab serials and num items in fridge
 serials = fireserial.get()
 num_in = len(firein.get())
 
@@ -31,15 +30,14 @@ def put_in(scanned):
     global num_in
 
     num_in += 1
-    #fireputin.patch({scanned:True})
+    fireputin.patch({scanned:True})
     print "Puttin in " + serials[scanned]
     
 def take_out(scanned):
     global num_in
-
     num_in -= 1
 
-    #firetakeout.patch({scanned:True})
+    firetakeout.patch({scanned:True})
     print "Taking out " + serials[scanned] 
     
 running = True
@@ -47,7 +45,10 @@ def get_serial():
     global serials, num_in
     global running
     
-    #print serials
+    #Let the arduino know we're ready for business
+    time.sleep(.8)
+    ser.write("r")
+    print "Ready!"
     
     last_scan = -1
     last_in = -1
@@ -100,5 +101,4 @@ def get_serial():
 
             
 
-print "Ready!"
 get_serial()
