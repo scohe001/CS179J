@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,5 +110,34 @@ public class FoodListAdapter extends BaseAdapter {
         mDataSource.clear();
     }
 
+    ArrayList<Integer> getUsage() {
+        ArrayList<Integer> usage = new ArrayList<>();
+        for(int x = 0; x < 7; x++) usage.add(0); //Fill with 7 items for days
+
+        for(ArrayList<Food> food : mDataSource) {
+            for(Food f : food) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(f.inFridge);
+                int day = (c.get(Calendar.DAY_OF_WEEK) + 6) % 7;
+                usage.set(day, usage.get(day) + 1);
+
+                Log.d("ADAPTER", "Calling: " + f.inFridge.toString());
+                Log.d("ADAPTER", "Day: " + String.valueOf(day));
+            }
+        }
+
+        return usage;
+    }
+
+    Date getNewest() {
+        Date newest = new Date(Long.MIN_VALUE);
+        for(ArrayList<Food> food : mDataSource) {
+            for(Food f : food) {
+                if(f.inFridge.after(newest)) newest = f.inFridge;
+            }
+        }
+
+        return newest;
+    }
 
 }

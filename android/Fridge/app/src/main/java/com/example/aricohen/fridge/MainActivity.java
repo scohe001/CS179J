@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -12,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,9 +40,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import com.example.aricohen.fridge.FoodListAdapter;
+import com.jjoe64.graphview.DefaultLabelFormatter;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.ValueDependentColor;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -57,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private FoodListAdapter historyAdapter;
     private MainActivity me;
     private int numInFridge;
+    private int numOutFridge;
     private String food_to_add;
 
 
@@ -218,7 +230,79 @@ public class MainActivity extends AppCompatActivity {
         database.getReference("message").setValue("Dashboard");
 
         TextView itemsIn = (TextView) findViewById(R.id.num_items_in);
+        TextView itemsOut = (TextView) findViewById(R.id.num_items_out);
         itemsIn.setText(String.valueOf(numInFridge));
+        itemsOut.setText(String.valueOf(numOutFridge));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy hh:mm a");
+        TextView lastShop = (TextView) findViewById(R.id.last_shop);
+        lastShop.setText(sdf.format(historyAdapter.getNewest()));
+
+        //Calculate purchases from history...
+        //for(historyAdapter.getCount()
+        ArrayList<Integer> days = historyAdapter.getUsage();
+
+        GraphView graph = (GraphView) findViewById(R.id.usage_graph);
+        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
+                //new DataPoint(0, 1),
+                new DataPoint(1, days.get(0)),
+                new DataPoint(2, days.get(1)),
+                new DataPoint(3, days.get(2)),
+                new DataPoint(4, days.get(3)),
+                new DataPoint(5, days.get(4)),
+                new DataPoint(6, days.get(5)),
+                new DataPoint(7, days.get(6)),
+        });
+        graph.addSeries(series);
+
+        series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
+            @Override
+            public int get(DataPoint data) {
+                return ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null);
+            }
+        });
+
+        series.setSpacing(10);
+
+        // draw values on top
+        series.setDrawValuesOnTop(true);
+        series.setValuesOnTopColor(Color.BLACK);
+
+        graph.getGridLabelRenderer().setNumHorizontalLabels(8);
+
+        graph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+
+        graph.getGridLabelRenderer().setHorizontalAxisTitleColor(Color.BLACK);
+        graph.getGridLabelRenderer().setVerticalAxisTitleColor(Color.BLACK);
+        graph.getGridLabelRenderer().setVerticalLabelsColor(Color.BLACK);
+        graph.getGridLabelRenderer().setHorizontalLabelsColor(Color.BLACK);
+
+        //set manual x axis limits to shows days of week
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0.5);
+        graph.getViewport().setMaxX(7.5);
+        //Manually create lables for x axis
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    // show days of week instead of x vals
+                    switch ((int) value) {
+                        case 1: return "S";
+                        case 2: return "M";
+                        case 3: return "T";
+                        case 4: return "W";
+                        case 5: return "R";
+                        case 6: return "F";
+                        case 7: return "S";
+                        default: return super.formatLabel(value, isValueX);
+                    }
+                } else {
+                    // show normal y values
+                    return super.formatLabel(value, isValueX);
+                }
+            }
+        });
     }
 
     //Called when history tab is selected
@@ -327,7 +411,31 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView itemsIn = (TextView) findViewById(R.id.num_items_in);
                 //If dashboard tab is selected and visible...
-                if(itemsIn != null) itemsIn.setText(String.valueOf(numInFridge));
+                if(itemsIn != null) setupDashboard();
+                //if(itemsIn != null) itemsIn.setText(String.valueOf(numInFridge));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("DB", "Failed to read value.", error.toException());
+            }
+        });
+
+        // Attach listener to watch changes to what's out of the fridge
+        database.getReference("Taken Out").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                numOutFridge = 0;
+                for(DataSnapshot foodSnapshot : dataSnapshot.getChildren()) {
+                    if(foodSnapshot.getKey().equals("na")) continue;
+                    numOutFridge++;
+                }
+
+//                TextView itemsOut = (TextView) findViewById(R.id.num_items_out);
+//                //If dashboard tab is selected and visible...
+//                setupDashboard();
 
             }
 
@@ -373,8 +481,8 @@ public class MainActivity extends AppCompatActivity {
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        window.setNavigationBarColor(getResources().getColor(R.color.colorPrimary));
+        window.setStatusBarColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
+        window.setNavigationBarColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
 
         //Setup add button for fridge page
         ViewGroup vg = (ViewGroup)(getWindow().getDecorView().getRootView());

@@ -81,41 +81,6 @@
 
     </TableRow>
 
-    <!--Last action-->
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
-        <!--android:background="@color/colorLight"-->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="8dp"
-            android:text="Last Action: "
-            android:gravity="top"
-            android:textStyle="normal|bold"
-            android:textColor="@color/colorDarker"
-            android:textSize="20dp"/>
-
-        <TextView
-            android:id="@+id/last_action"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="8dp"
-            android:text="05/20/17 5:43p"
-            android:gravity="top"
-            android:textColor="@color/colorDarker"
-            android:textSize="20dp"/>
-
-    </TableRow>
 
     <!--Last shop-->
     <TableRow
@@ -150,6 +115,23 @@
             android:gravity="top"
             android:textColor="@color/colorDarker"
             android:textSize="20dp"/>
+
+    </TableRow>
+
+
+    //Usage graph
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/usage_graph"
+            android:layout_weight="1"
+            android:layout_marginBottom="10dp"/>
 
     </TableRow>
 
