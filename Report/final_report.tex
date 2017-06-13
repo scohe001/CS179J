@@ -1,0 +1,180 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage} and 
+% move this file to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./title_page_1.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\title{Title page with logo}
+%----------------------------------------------------------------------------------------
+%   PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%   HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE University California Riverside}\\[1.5cm] % Name of your university/college
+\textsc{\Large CS179J Senior Design Project}\\[0.5cm] % Major heading such as course name
+\textsc{\large Spring 2017}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%   TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Smart Fridge}\\[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+ 
+%----------------------------------------------------------------------------------------
+%   AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+Stanley \textsc{Cohen} % Your name
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Professor:} \\
+Frank \textsc{Vahid} % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[2cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%   DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%   LOGO SECTION
+%----------------------------------------------------------------------------------------
+\includegraphics[scale=.5]{logo.png}\\[1cm] % Include a department/university logo - this will require the graphicx package
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+
+\begin{abstract}
+The Smart Fridge is a fridge designed to help users keep track of their fridge contents and buying habits. 
+    It consists of three main systems; a system at the fridge to monitor insertions and removals, 
+    a system in the cloud to store all data and a smartphone system to communicate with the user.
+\end{abstract}
+
+\section{User Guide}
+
+
+Once the fridge is installed, simply plug the Raspberry Pi on to boot up the system. 
+    A green LED will light when the database has been properly fetched and the system is ready for inputs.
+    At this point, simply scan your items with the barcode scanner before you put them into or remove them from the fridge.
+    Your insertions/removals will be automatically communicated to the database that is always waiting for more information.\\
+
+All of your firdge information can be seen in the Android phone app. Once the app has been installed, simply navigate between
+    the \textit{Dashboard}, \textit{Fridge} and \textit{History} tabs to get more information on the contents of your fridge
+    and your past purchases.
+\section{Technologies and Components}
+
+\begin{itemize}
+	\item Raspberry Pi
+	\item Arduino Uno
+    \item IR LED/Reciever
+	\item Firebase NoSQL Database
+    \item Firebase Backend Javascript Cloud Functions
+	\item Android App (built with Java/XML)
+\end{itemize}
+
+\section{Demo Video}
+
+Demo video can be found \href{https://youtu.be/m8oFfEKpmIg}{here}.
+
+\section{Source Code}
+\label{sec:code}
+
+\subsection{Raspberry Pi}
+
+\subsubsection{main.py}
+
+This is the main script for the fridge. It is in the \textit{bashrc} file so that when the Pi is booted into terminal mode, 
+    it will be run automatically (no monitor needed!). The script fetches the current information from the database and listens for
+    barcode scans from the scanner and IR beam breaks from the Arduino.\\
+
+If it senses a beam break and then a scan, it will write to the database that the food has been taken out of the fridge. 
+    If it senses a scan and then a beam break, it will write to the database that the food has been put in.
+
+\subsection{Arduino}
+
+\subsubsection{IR\_sensor.ino}
+
+Listens for an IR beam break. On beam break, sends the signal to the Raspberry Pi.
+
+Also looks for a button press. On button press, requests fridge data from Pi to send to Dylan via Software Serial.
+
+\subsection{Firebase}
+
+\subsubsection{index.js}
+
+Backend JavaScript used to made reads and writes to the database a LOT easier. Also every minute checks to see if there is expired food.
+
+\subsection{Android}
+
+\subsubsection{MainActivity.java}
+
+Main Java file. Attach listeners to the database nodes and handle tab switching along with most everything else in the app.
+
+\subsubsection{Food.java}
+
+Simple Java class to store a food. Mostly just a bunch of datafields. The only complicated thing here is the string to date converter that matches the default Friebase format.
+
+\subsubsection{FoodListAdapter.java}
+
+Custom ListView adapter for displaying lists of food. Takes an array of arrays of foods and ensures they're displayed properly when their views are called. Also added a function, \textit{getUsage} for getting the number of purchases on any given day of the week to make it easy to create the graph.
+
+\end{document}
